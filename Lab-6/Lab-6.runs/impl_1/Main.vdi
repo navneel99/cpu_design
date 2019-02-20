@@ -1,0 +1,133 @@
+#-----------------------------------------------------------
+# Vivado v2016.4 (64-bit)
+# SW Build 1756540 on Mon Jan 23 19:11:19 MST 2017
+# IP Build 1755317 on Mon Jan 23 20:30:07 MST 2017
+# Start of session at: Tue Feb 19 17:02:47 2019
+# Process ID: 1471
+# Current directory: /home/dual/cs5170417/Desktop/Lab-6/Lab-6.runs/impl_1
+# Command line: vivado -log Main.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source Main.tcl -notrace
+# Log file: /home/dual/cs5170417/Desktop/Lab-6/Lab-6.runs/impl_1/Main.vdi
+# Journal file: /home/dual/cs5170417/Desktop/Lab-6/Lab-6.runs/impl_1/vivado.jou
+#-----------------------------------------------------------
+#-----------------------------------------------------------
+# Vivado v2016.4 (64-bit)
+# SW Build 1756540 on Mon Jan 23 19:11:19 MST 2017
+# IP Build 1755317 on Mon Jan 23 20:30:07 MST 2017
+# Start of session at: Tue Feb 19 17:02:59 2019
+# Process ID: 1563
+# Current directory: /home/dual/cs5170417/Desktop/Lab-6/Lab-6.runs/impl_1
+# Command line: vivado -log Main.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source Main.tcl -notrace
+# Log file: /home/dual/cs5170417/Desktop/Lab-6/Lab-6.runs/impl_1/Main.vdi
+# Journal file: /home/dual/cs5170417/Desktop/Lab-6/Lab-6.runs/impl_1/vivado.jou
+#-----------------------------------------------------------
+source Main.tcl -notrace
+Command: open_checkpoint Main_routed.dcp
+
+Starting open_checkpoint Task
+
+Time (s): cpu = 00:00:00.02 ; elapsed = 00:00:00.03 . Memory (MB): peak = 987.910 ; gain = 0.000 ; free physical = 996 ; free virtual = 14214
+INFO: [Netlist 29-17] Analyzing 121 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+WARNING: [Netlist 29-101] Netlist 'Main' is not ideal for floorplanning, since the cellview 'CPU' contains a large number of primitives.  Please consider enabling hierarchy in synthesis if you want to do floorplanning.
+INFO: [Project 1-479] Netlist was created with Vivado 2016.4
+INFO: [Device 21-403] Loading part xc7a35tcpg236-1
+INFO: [Project 1-570] Preparing netlist for logic optimization
+Parsing XDC File [/home/dual/cs5170417/Desktop/Lab-6/Lab-6.runs/impl_1/.Xil/Vivado-1471-indus/dcp/Main.xdc]
+Finished Parsing XDC File [/home/dual/cs5170417/Desktop/Lab-6/Lab-6.runs/impl_1/.Xil/Vivado-1471-indus/dcp/Main.xdc]
+Reading XDEF placement.
+Reading placer database...
+Reading XDEF routing.
+Read XDEF File: Time (s): cpu = 00:00:00.12 ; elapsed = 00:00:00.15 . Memory (MB): peak = 1271.688 ; gain = 1.000 ; free physical = 581 ; free virtual = 13837
+Restored from archive | CPU: 0.120000 secs | Memory: 2.435837 MB |
+Finished XDEF File Restore: Time (s): cpu = 00:00:00.12 ; elapsed = 00:00:00.15 . Memory (MB): peak = 1271.688 ; gain = 1.000 ; free physical = 581 ; free virtual = 13837
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 32 instances were transformed.
+  RAM256X1S => RAM256X1S (RAMS64E, RAMS64E, RAMS64E, RAMS64E, MUXF7, MUXF7, MUXF8): 32 instances
+
+INFO: [Project 1-604] Checkpoint was created with Vivado v2016.4 (64-bit) build 1756540
+open_checkpoint: Time (s): cpu = 00:00:05 ; elapsed = 00:00:07 . Memory (MB): peak = 1271.688 ; gain = 283.777 ; free physical = 585 ; free virtual = 13836
+Command: write_bitstream -force -no_partial_bitfile Main.bit
+Attempting to get a license for feature 'Implementation' and/or device 'xc7a35t'
+INFO: [Common 17-349] Got license for feature 'Implementation' and/or device 'xc7a35t'
+Running DRC as a precondition to command write_bitstream
+INFO: [DRC 23-27] Running DRC with 8 threads
+WARNING: [DRC 23-20] Rule violation (PDRC-153) Gated clock check - Net temp_CPU/i_decoded_reg[0]_i_2_n_1 is a gated clock net sourced by a combinational pin temp_CPU/i_decoded_reg[0]_i_2/O, cell temp_CPU/i_decoded_reg[0]_i_2. This is not good design practice and will likely impact performance. For SLICE registers, for example, use the CE pin to control the loading of data.
+WARNING: [DRC 23-20] Rule violation (PDRC-153) Gated clock check - Net temp_CPU/i_decoded_reg[1]_i_2_n_1 is a gated clock net sourced by a combinational pin temp_CPU/i_decoded_reg[1]_i_2/O, cell temp_CPU/i_decoded_reg[1]_i_2. This is not good design practice and will likely impact performance. For SLICE registers, for example, use the CE pin to control the loading of data.
+WARNING: [DRC 23-20] Rule violation (PDRC-153) Gated clock check - Net temp_CPU/i_decoded_reg[2]_i_2_n_1 is a gated clock net sourced by a combinational pin temp_CPU/i_decoded_reg[2]_i_2/O, cell temp_CPU/i_decoded_reg[2]_i_2. This is not good design practice and will likely impact performance. For SLICE registers, for example, use the CE pin to control the loading of data.
+WARNING: [DRC 23-20] Rule violation (PDRC-153) Gated clock check - Net temp_CPU/i_decoded_reg[3]_i_2_n_1 is a gated clock net sourced by a combinational pin temp_CPU/i_decoded_reg[3]_i_2/O, cell temp_CPU/i_decoded_reg[3]_i_2. This is not good design practice and will likely impact performance. For SLICE registers, for example, use the CE pin to control the loading of data.
+WARNING: [DRC 23-20] Rule violation (PDRC-153) Gated clock check - Net temp_CPU/rf_reg[15][7]_LDC_i_1_n_1 is a gated clock net sourced by a combinational pin temp_CPU/rf_reg[15][7]_LDC_i_1/O, cell temp_CPU/rf_reg[15][7]_LDC_i_1. This is not good design practice and will likely impact performance. For SLICE registers, for example, use the CE pin to control the loading of data.
+WARNING: [DRC 23-20] Rule violation (PDRC-153) Gated clock check - Net temp_CPU/rf_reg[15][8]_LDC_i_1_n_1 is a gated clock net sourced by a combinational pin temp_CPU/rf_reg[15][8]_LDC_i_1/O, cell temp_CPU/rf_reg[15][8]_LDC_i_1. This is not good design practice and will likely impact performance. For SLICE registers, for example, use the CE pin to control the loading of data.
+WARNING: [DRC 23-20] Rule violation (PDRC-153) Gated clock check - Net temp_CPU/rf_reg[15][9]_LDC_i_1_n_1 is a gated clock net sourced by a combinational pin temp_CPU/rf_reg[15][9]_LDC_i_1/O, cell temp_CPU/rf_reg[15][9]_LDC_i_1. This is not good design practice and will likely impact performance. For SLICE registers, for example, use the CE pin to control the loading of data.
+INFO: [Vivado 12-3199] DRC finished with 0 Errors, 7 Warnings
+INFO: [Vivado 12-3200] Please refer to the DRC report (report_drc) for more information.
+source Main.tcl -notrace
+Command: open_checkpoint Main_routed.dcp
+
+Starting open_checkpoint Task
+
+Time (s): cpu = 00:00:00.02 ; elapsed = 00:00:00.02 . Memory (MB): peak = 987.910 ; gain = 0.000 ; free physical = 497 ; free virtual = 13749
+Loading data files...
+INFO: [Netlist 29-17] Analyzing 121 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+WARNING: [Netlist 29-101] Netlist 'Main' is not ideal for floorplanning, since the cellview 'CPU' contains a large number of primitives.  Please consider enabling hierarchy in synthesis if you want to do floorplanning.
+INFO: [Project 1-479] Netlist was created with Vivado 2016.4
+INFO: [Device 21-403] Loading part xc7a35tcpg236-1
+INFO: [Project 1-570] Preparing netlist for logic optimization
+Parsing XDC File [/home/dual/cs5170417/Desktop/Lab-6/Lab-6.runs/impl_1/.Xil/Vivado-1563-indus/dcp/Main.xdc]
+Finished Parsing XDC File [/home/dual/cs5170417/Desktop/Lab-6/Lab-6.runs/impl_1/.Xil/Vivado-1563-indus/dcp/Main.xdc]
+Reading XDEF placement.
+Reading placer database...
+Reading XDEF routing.
+Read XDEF File: Time (s): cpu = 00:00:00.11 ; elapsed = 00:00:00.12 . Memory (MB): peak = 1271.688 ; gain = 1.000 ; free physical = 108 ; free virtual = 13238
+Restored from archive | CPU: 0.110000 secs | Memory: 2.435837 MB |
+Finished XDEF File Restore: Time (s): cpu = 00:00:00.11 ; elapsed = 00:00:00.12 . Memory (MB): peak = 1271.688 ; gain = 1.000 ; free physical = 108 ; free virtual = 13238
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 32 instances were transformed.
+  RAM256X1S => RAM256X1S (RAMS64E, RAMS64E, RAMS64E, RAMS64E, MUXF7, MUXF7, MUXF8): 32 instances
+
+INFO: [Project 1-604] Checkpoint was created with Vivado v2016.4 (64-bit) build 1756540
+Command: write_bitstream -force -no_partial_bitfile Main.bit
+Attempting to get a license for feature 'Implementation' and/or device 'xc7a35t'
+INFO: [Common 17-349] Got license for feature 'Implementation' and/or device 'xc7a35t'
+Loading site data...
+Loading route data...
+Processing options...
+Creating bitmap...
+Running DRC as a precondition to command write_bitstream
+INFO: [DRC 23-27] Running DRC with 8 threads
+WARNING: [DRC 23-20] Rule violation (PDRC-153) Gated clock check - Net temp_CPU/i_decoded_reg[0]_i_2_n_1 is a gated clock net sourced by a combinational pin temp_CPU/i_decoded_reg[0]_i_2/O, cell temp_CPU/i_decoded_reg[0]_i_2. This is not good design practice and will likely impact performance. For SLICE registers, for example, use the CE pin to control the loading of data.
+WARNING: [DRC 23-20] Rule violation (PDRC-153) Gated clock check - Net temp_CPU/i_decoded_reg[1]_i_2_n_1 is a gated clock net sourced by a combinational pin temp_CPU/i_decoded_reg[1]_i_2/O, cell temp_CPU/i_decoded_reg[1]_i_2. This is not good design practice and will likely impact performance. For SLICE registers, for example, use the CE pin to control the loading of data.
+WARNING: [DRC 23-20] Rule violation (PDRC-153) Gated clock check - Net temp_CPU/i_decoded_reg[2]_i_2_n_1 is a gated clock net sourced by a combinational pin temp_CPU/i_decoded_reg[2]_i_2/O, cell temp_CPU/i_decoded_reg[2]_i_2. This is not good design practice and will likely impact performance. For SLICE registers, for example, use the CE pin to control the loading of data.
+WARNING: [DRC 23-20] Rule violation (PDRC-153) Gated clock check - Net temp_CPU/i_decoded_reg[3]_i_2_n_1 is a gated clock net sourced by a combinational pin temp_CPU/i_decoded_reg[3]_i_2/O, cell temp_CPU/i_decoded_reg[3]_i_2. This is not good design practice and will likely impact performance. For SLICE registers, for example, use the CE pin to control the loading of data.
+WARNING: [DRC 23-20] Rule violation (PDRC-153) Gated clock check - Net temp_CPU/rf_reg[15][7]_LDC_i_1_n_1 is a gated clock net sourced by a combinational pin temp_CPU/rf_reg[15][7]_LDC_i_1/O, cell temp_CPU/rf_reg[15][7]_LDC_i_1. This is not good design practice and will likely impact performance. For SLICE registers, for example, use the CE pin to control the loading of data.
+WARNING: [DRC 23-20] Rule violation (PDRC-153) Gated clock check - Net temp_CPU/rf_reg[15][8]_LDC_i_1_n_1 is a gated clock net sourced by a combinational pin temp_CPU/rf_reg[15][8]_LDC_i_1/O, cell temp_CPU/rf_reg[15][8]_LDC_i_1. This is not good design practice and will likely impact performance. For SLICE registers, for example, use the CE pin to control the loading of data.
+WARNING: [DRC 23-20] Rule violation (PDRC-153) Gated clock check - Net temp_CPU/rf_reg[15][9]_LDC_i_1_n_1 is a gated clock net sourced by a combinational pin temp_CPU/rf_reg[15][9]_LDC_i_1/O, cell temp_CPU/rf_reg[15][9]_LDC_i_1. This is not good design practice and will likely impact performance. For SLICE registers, for example, use the CE pin to control the loading of data.
+INFO: [Vivado 12-3199] DRC finished with 0 Errors, 7 Warnings
+INFO: [Vivado 12-3200] Please refer to the DRC report (report_drc) for more information.
+Loading data files...
+Creating bitstream...
+Bitstream compression saved 13839360 bits.
+Writing bitstream ./Main.bit...
+INFO: [Vivado 12-1842] Bitgen Completed Successfully.
+INFO: [Project 1-118] WebTalk data collection is enabled (User setting is ON. Install Setting is ON.).
+Loading site data...
+Loading route data...
+Processing options...
+Creating bitmap...
+Creating bitstream...
+Bitstream compression saved 13839360 bits.
+Writing bitstream ./Main.bit...
+INFO: [Vivado 12-1842] Bitgen Completed Successfully.
+INFO: [Project 1-118] WebTalk data collection is enabled (User setting is ON. Install Setting is ON.).
+INFO: [Common 17-83] Releasing license: Implementation
+INFO: [Common 17-83] Releasing license: Implementation
+14 Infos, 8 Warnings, 0 Critical Warnings and 0 Errors encountered.
+14 Infos, 8 Warnings, 0 Critical Warnings and 0 Errors encountered.
+write_bitstream completed successfully
+write_bitstream: Time (s): cpu = 00:00:12 ; elapsed = 00:00:16 . Memory (MB): peak = 1672.344 ; gain = 400.656 ; free physical = 149 ; free virtual = 12810
+write_bitstream completed successfully
+write_bitstream: Time (s): cpu = 00:00:11 ; elapsed = 00:00:10 . Memory (MB): peak = 1672.344 ; gain = 400.656 ; free physical = 149 ; free virtual = 12810
+INFO: [Vivado_Tcl 4-395] Unable to parse hwdef file Main.hwdef
+INFO: [Vivado_Tcl 4-395] Unable to parse hwdef file Main.hwdef
+INFO: [Common 17-206] Exiting Vivado at Tue Feb 19 17:03:25 2019...
+INFO: [Common 17-206] Exiting Vivado at Tue Feb 19 17:03:25 2019...

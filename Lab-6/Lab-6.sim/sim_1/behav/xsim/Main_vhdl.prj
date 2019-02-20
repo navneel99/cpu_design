@@ -1,0 +1,10 @@
+# compile vhdl design source files
+vhdl xil_defaultlib  \
+"../../../../Lab-6.srcs/sources_1/new/CPU.vhd" \
+"../../../../Lab-6.srcs/sources_1/new/debounce.vhd" \
+"../../../../Lab-6.srcs/sources_1/new/display_interface.vhd" \
+"../../../../Lab-6.srcs/sources_1/new/freq_divider.vhd" \
+"../../../../Lab-6.srcs/sources_1/new/Main.vhd" \
+
+# Do not sort compile order
+nosort
