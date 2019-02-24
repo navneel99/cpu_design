@@ -1,3 +1,7 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
 entity rf is 
 port(
 	wd : in std_logic_vector(31 downto 0);
@@ -10,6 +14,7 @@ port(
 	rd1 : out std_logic_vector(32 downto 0);
 	rd2 : out std_logic_vector(32 downto 0)	
 );
+end rf;
 
 architecture Behavioral of rf is 
 type mult_array is array(15 downto 0) of std_logic_vector(31 downto 0);
@@ -49,8 +54,7 @@ rd1 <= rfile(0) when rad1="0000" else
  rfile(12) when rad1="1100" else
  rfile(13) when rad1="1101" else
  rfile(14) when rad1="1110" else
- rfile(15)  when rad1="1111" else
-null;
+ rfile(15)  when rad1="1111";
 
 rd2 <= rfile(0) when rad2="0000" else
 rfile(1) when rad2="0001" else
@@ -67,49 +71,48 @@ rfile(11) when rad2="1011" else
 rfile(12) when rad2="1100" else
 rfile(13) when rad2="1101" else
 rfile(14) when rad2="1110" else
-rfile(15)  when rad2="1111" else
-null;
+rfile(15)  when rad2="1111";
 
 
 
 write_port:	process(clk,reset,wad)
-begin process
+begin
 
 if reset='0' then
 	if rising_edge(clk) then
 		if(enable='1') then 
 			case wad is
-				when wad="0000" =>
+				when "0000" =>
 					rfile(0) <= wd;
-				when wad="0001" =>
+				when "0001" =>
 					rfile(1) <= wd;
-				when wad="0010" =>
+				when "0010" =>
 					rfile(2) <= wd;
-				when wad="0011" =>
+				when "0011" =>
 					rfile(3) <= wd;
-				when wad="0100" =>
+				when "0100" =>
 					rfile(4) <= wd;
-				when wad="0101" =>
+				when "0101" =>
 					rfile(5) <= wd;
-				when wad="0110" =>
+				when "0110" =>
 					rfile(6) <= wd;
-				when wad="0111" =>
+				when "0111" =>
 					rfile(7) <= wd;					
-				when wad="1000" =>
+				when "1000" =>
 					rfile(8) <= wd;
-				when wad="1001" =>
+				when "1001" =>
 					rfile(9) <= wd;
-				when wad="1010" =>
+				when "1010" =>
 					rfile(10) <= wd;
-				when wad="1011" =>
+				when "1011" =>
 					rfile(11) <= wd;
-				when wad="1100" =>
+				when "1100" =>
 					rfile(12) <= wd;
-				when wad="1101" =>
+				when "1101" =>
 					rfile(13) <= wd;
-				when wad="1110" =>
+				when "1110" =>
 					rfile(14) <= wd;
-				when wad="1111" =>
+				when "1111" =>
 					rfile(15) <= wd;					
 				when others => null;
 			end case;
@@ -140,4 +143,5 @@ end if;
 end process;
 
 end Behavioral;
+
 
