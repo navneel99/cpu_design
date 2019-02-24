@@ -1,11 +1,16 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
 entity Decoder is
 Port(
 clk: in std_logic;
 pmem: in std_logic_vector(31 downto 0);
-out_code: out std_logic_vector(5 downto 0);
+out_code: out std_logic_vector(5 downto 0)
 );
+end Decoder;
 
-architecture Behavioral of Decoder is 
+architecture Arch_Decoder of Decoder is 
 
 type instr_class_type is (DP, DT, branch, unknown);
 type i_decoded_type is (add,sub,cmp,mov,ldr,str,beq,bne,b,halt,unknown);
@@ -24,6 +29,7 @@ signal Imm8: std_logic_vector(7 downto 0);
 signal Rm: std_logic_vector(3 downto 0 );
 signal Imm24: std_logic_vector(23 downto 0); 
 signal Imm12: std_logic_vector(11 downto 0);
+signal shift_spec: std_logic_vector(7 downto 0);
 
 begin 
 
@@ -62,6 +68,7 @@ Imm12 <= pmem(11 downto 0);
     bne WHEN cond="0001" else
 
     halt when pmem = "00000000000000000000000000000000";
+--    null when others;
     
     instr_class <= DP when F_field = "00" else
                    DT when F_field = "01" else
@@ -77,6 +84,6 @@ Imm12 <= pmem(11 downto 0);
      			"100110" WHEN i_decoded <= b else
      			"100111" WHEN i_decoded <= beq else
      			"101000" WHEN i_decoded <= bne else
-     			"11x1001" WHEN i_decoded <= halt else
+     			"111001" WHEN i_decoded <= halt;
 
-end Behavioral;
+end Arch_Decoder;
