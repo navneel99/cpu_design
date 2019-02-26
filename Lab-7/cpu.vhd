@@ -61,7 +61,7 @@ PORT (
 	rd1 : in std_logic_vector(31 downto 0); 
 	rd2 : in std_logic_vector(31 downto 0);
 --	operand inputs
-	sel : in std_logic_vector(1 downto 0); --add or subtract only
+	sel : in std_logic_vector(5 downto 0);
 	res : out std_logic_vector(31 downto 0); --result
 	carry : in std_logic;
 	flag : out std_logic --flag output
@@ -92,10 +92,17 @@ port(
 );
 end component;
 
-signal clk, reset, step, instr, go : std_logic;
-signal out_code: std_logic_vector(5 downto 0);
---signal 
-    
+signal clk, reset, step, instr, go, temp_enable : std_logic;
+signal temp_out_code: std_logic_vector(5 downto 0);
+signal temp_ex_state: std_logic_vector(2 downto 0);
+signal temp_LD_bit: std_logic;
+signal temp_ctrl_state: std_logic_vector(1 downto 0);
+signal temp_rd1, temp_rd2: std_logic_vector(31 downto 0);
+signal temp_sel: std_logic_vector(5 downto 0);
+signal temp_carry, temp_flag, temp_flagwe: std_logic;
+signal temp_pmem, temp_wd: std_logic_vector(31 downto 0);
+signal temp_rad1,temp_rad2, temp_wad: std_logic_vector(3 downto 0);
+signal temp_rf_rd1, temp_rf_rd2: std_logic_vector(32 downto 0);
 
 begin
 
