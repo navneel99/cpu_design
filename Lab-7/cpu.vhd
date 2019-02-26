@@ -86,8 +86,10 @@ port(
 	enable : in std_logic; --write enable
 	clk: in std_logic;
 	reset : in std_logic;
-	rd1 : out std_logic_vector(32 downto 0);
-	rd2 : out std_logic_vector(32 downto 0)	
+	rd1 : out std_logic_vector(31 downto 0);
+	rd2 : out std_logic_vector(31 downto 0);
+	pc_in : in std_logic_vector(31 downto 0);
+	pc_out : out std_logic_vector(31 downto 0)	
 --	Be sure to add the Program Counter Here
 );
 end component;
@@ -103,6 +105,7 @@ signal temp_carry, temp_flag, temp_flagwe: std_logic;
 signal temp_pmem, temp_wd: std_logic_vector(31 downto 0);
 signal temp_rad1,temp_rad2, temp_wad: std_logic_vector(3 downto 0);
 signal temp_rf_rd1, temp_rf_rd2: std_logic_vector(31 downto 0);
+signal temp_pcin, temp_pcout : std_logic_vector(31 downto 0);
 
 begin
 
@@ -137,18 +140,26 @@ port map(
     flag => temp_flag
 );
 
---temp_rf: rf
---port map(
+temp_rf: rf
+port map(
+    wd => temp_wd,
+    rad1 => temp_rad1,
+    rad2 => temp_rad2,
+    pc_in => temp_pcin,
+    pc_out => temp_pcout,
+    wad => temp_wad,
+    clk => clk,
+    enable => temp_enable,
+    reset => reset,
+    rd1 => temp_rf_rd1,
+    rd2 => temp_rf_rd2
+);
 
-----FILL HERE
-
---);
-
---temp_Decoder: Decoder
---port map(
-
-----FILL HERE
-
---);
+temp_Decoder: Decoder
+port map(
+    clk => clk,
+    pmem => temp_pmem,
+    out_code => temp_out_code
+);
 
 end Behavioral;
