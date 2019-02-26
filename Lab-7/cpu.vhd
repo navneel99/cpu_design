@@ -97,14 +97,58 @@ signal temp_out_code: std_logic_vector(5 downto 0);
 signal temp_ex_state: std_logic_vector(2 downto 0);
 signal temp_LD_bit: std_logic;
 signal temp_ctrl_state: std_logic_vector(1 downto 0);
-signal temp_rd1, temp_rd2: std_logic_vector(31 downto 0);
+signal temp_rd1, temp_rd2, temp_res: std_logic_vector(31 downto 0);
 signal temp_sel: std_logic_vector(5 downto 0);
 signal temp_carry, temp_flag, temp_flagwe: std_logic;
 signal temp_pmem, temp_wd: std_logic_vector(31 downto 0);
 signal temp_rad1,temp_rad2, temp_wad: std_logic_vector(3 downto 0);
-signal temp_rf_rd1, temp_rf_rd2: std_logic_vector(32 downto 0);
+signal temp_rf_rd1, temp_rf_rd2: std_logic_vector(31 downto 0);
 
 begin
 
+temp_csFSM: control_state_FSM
+port map(
+    clk => clk,
+    reset => reset,
+    in_execution_state =>temp_ex_state,
+    LD_bit => temp_LD_bit,
+    out_code => temp_out_code,
+    control_state => temp_ctrl_state
+);
+
+temp_esFSM: execution_state_FSM
+port map(
+    clk => clk,
+    reset => reset,
+    step => step,
+    instr => instr,
+    go => go,
+    control_state => temp_ctrl_state,
+    out_execution_state => temp_ex_state    
+);
+
+temp_alu: ALU
+port map(
+    rd1 => temp_rd1,
+    rd2 => temp_rd2,
+    sel => temp_sel,
+    res => temp_res,
+    carry => temp_carry,
+    flag => temp_flag
+);
+
+--temp_rf: rf
+--port map(
+
+----FILL HERE
+
+--);
+
+--temp_Decoder: Decoder
+--port map(
+
+----FILL HERE
+
+--);
 
 end Behavioral;
