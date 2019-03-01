@@ -1,4 +1,4 @@
-library IEEE;
+5 	library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
@@ -86,12 +86,7 @@ rd2 <= rfile(to_integer(unsigned(rad2)));
 
 pc_out <= pc when enable='1';
 
-
-write_port:	process(clk,reset,wad)
-begin
-
 if reset='0' then
-	if rising_edge(clk) then
 		if(enable='1') then 
 --			case wad is
 --				when "0000" =>
@@ -130,7 +125,7 @@ if reset='0' then
 --			end case;
             rfile(to_integer(unsigned(wad))) <= wd;
 			pc <= pc_in;
-		end if;
+		
 	end if;
 
 
