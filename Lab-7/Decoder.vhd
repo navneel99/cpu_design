@@ -75,15 +75,15 @@ Imm12 <= pmem(11 downto 0);
                    branch when F_field = "10" else
                    unknown;
 
-    out_code <= "000000" WHEN i_decoded <= add else
-     			"000001" WHEN i_decoded <= sub else
-     			"000010" WHEN i_decoded <= mov else
-     			"000011" WHEN i_decoded <= cmp else
-     			"010100" WHEN i_decoded <= str else
-     			"010101" WHEN i_decoded <= ldr else
-     			"100110" WHEN i_decoded <= b else
-     			"100111" WHEN i_decoded <= beq else
-     			"101000" WHEN i_decoded <= bne else
-     			"111001" WHEN i_decoded <= halt;
+    out_code <= "000000" WHEN i_decoded = add else
+     			"000001" WHEN i_decoded = sub else
+     			"000010" WHEN i_decoded = mov else
+     			"000011" WHEN i_decoded = cmp else
+     			"010100" WHEN i_decoded = str else
+     			"010101" WHEN i_decoded = ldr else
+     			"100110" WHEN i_decoded = b else
+     			"100111" WHEN i_decoded = beq else
+     			"101000" WHEN i_decoded = bne else
+     			"111001" WHEN i_decoded = halt;
 
 end Arch_Decoder;
