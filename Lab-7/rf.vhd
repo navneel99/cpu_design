@@ -13,7 +13,6 @@ port(
 	wad : in std_logic_vector(3 downto 0);
 	enable : in std_logic;
 	clk: in std_logic;
-	reset : in std_logic;
 	rd1 : out std_logic_vector(31 downto 0);
 	rd2 : out std_logic_vector(31 downto 0);	
 	pc_out : out std_logic_vector(31 downto 0);

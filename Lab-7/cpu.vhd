@@ -93,7 +93,6 @@ port(
 	wad : in std_logic_vector(3 downto 0);
 	enable : in std_logic;
 	clk: in std_logic;
-	reset : in std_logic;
 	rd1 : out std_logic_vector(31 downto 0);
 	rd2 : out std_logic_vector(31 downto 0);	
 	pc_out : out std_logic_vector(31 downto 0);
@@ -173,7 +172,7 @@ begin
 temp_csFSM: control_state_FSM
 port map(
     clk => clk,
-    reset => reset,
+    reset => debounced_reset,
     in_execution_state =>temp_ex_state,
     LD_bit => L_bit,
     out_code => temp_out_code,
@@ -184,10 +183,10 @@ port map(
 temp_esFSM: execution_state_FSM
 port map(
     clk => clk,
-    reset => reset,
-    step => step,
-    instr => instr,
-    go => go,
+    reset => debounced_reset,
+    step => debounced_step,
+    instr => debounced_instr,
+    go => debounced_go,
     control_state => temp_ctrl_state,
     out_execution_state => temp_ex_state    
 );
@@ -233,7 +232,6 @@ port map(
     wad => temp_wad,
     clk => clk,
     enable => temp_enable,
-    reset => reset,
     rd1 => temp_rf_rd1,
     rd2 => temp_rf_rd2,
     pc_enable => temp_pc_enable
