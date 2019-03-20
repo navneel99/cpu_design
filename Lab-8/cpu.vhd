@@ -1,3 +1,24 @@
+----------------------------------------------------------------------------------
+-- Company: 
+-- Engineer: 
+-- 
+-- Create Date: 02/26/2019 01:17:45 PM
+-- Design Name: 
+-- Module Name: cpu - Behavioral
+-- Project Name: 
+-- Target Devices: 
+-- Tool Versions: 
+-- Description: 
+-- 
+-- Dependencies: 
+-- 
+-- Revision:
+-- Revision 0.01 - File Created
+-- Additional Comments:
+-- 
+----------------------------------------------------------------------------------
+
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
@@ -11,12 +32,7 @@ use IEEE.NUMERIC_STD.ALL;
 --use UNISIM.VComponents.all;
 
 entity cpu is
-  Port (   
-      clk,reset,step,go,instr, slice_select: in std_logic;
-      led_vector: out std_logic_vector(15 downto 0);
-      reg_select: in std_logic_vector(3 downto 0);
-      display_select: in std_logic_vector(1 downto 0)  
-    );
+--  Port (     );
 end cpu;
 
 architecture Behavioral of cpu is
@@ -84,8 +100,6 @@ end component;
 
 component rf 
 port(
-    disp_rad: in std_logic_vector(3 downto 0);
-    disp_rd: out std_logic_vector(31 downto 0);
 	wd : in std_logic_vector(31 downto 0);
 	rad1 : in std_logic_vector(3 downto 0);
 	rad2 : in std_logic_vector(3 downto 0);
@@ -93,42 +107,15 @@ port(
 	wad : in std_logic_vector(3 downto 0);
 	enable : in std_logic;
 	clk: in std_logic;
+	reset : in std_logic;
 	rd1 : out std_logic_vector(31 downto 0);
 	rd2 : out std_logic_vector(31 downto 0);	
 	pc_out : out std_logic_vector(31 downto 0);
-	pc_enable:in std_logic
+	pc_enable: in std_logic
 );
 end component;
 
-component Clock_Generator
-    Port ( 
-       clk_in : in STD_LOGIC;
-       clk_out : out STD_LOGIC
-      );
-end component;
-
-component debounce 
-Port (
-input,clk: in std_logic;
-output: out std_logic
- );
-end component;
-
-component display_interface
-Port (
-    clk: in std_logic;
-    display_select: in std_logic_vector(1 downto 0);
-    slice_select: in std_logic;
-    ex_state: in std_logic_vector(2 downto 0);
-    control_state: in std_logic_vector(3 downto 0);   
-    pc: in std_logic_vector(31 downto 0); 
-    led_vector:out std_logic_vector(15 downto 0);
-    rf_element: in std_logic_vector(31 downto 0)
- );
-end component;
-
-
-signal slow_clk, debounced_reset, debounced_go, debounced_step,debounced_instr, temp_enable : std_logic;
+signal clk, reset, step, instr, go, temp_enable : std_logic;
 signal temp_ex_state: std_logic_vector(2 downto 0);
 signal temp_ctrl_state: std_logic_vector(1 downto 0);
 signal temp_rd1, temp_rd2, temp_res: std_logic_vector(31 downto 0);
@@ -137,8 +124,9 @@ signal temp_carry, temp_flag, temp_flagwe: std_logic;
 signal temp_pmem, temp_wd: std_logic_vector(31 downto 0);
 
 signal temp_rad1,temp_rad2, temp_wad: std_logic_vector(3 downto 0);
+
 signal temp_rf_rd1, temp_rf_rd2: std_logic_vector(31 downto 0);
-signal temp_disp_rd: std_logic_vector(31 downto 0);
+
 signal temp_flag_we: std_logic;
 
 signal temp_pcin : std_logic_vector(31 downto 0);
@@ -172,7 +160,7 @@ begin
 temp_csFSM: control_state_FSM
 port map(
     clk => clk,
-    reset => debounced_reset,
+    reset => reset,
     in_execution_state =>temp_ex_state,
     LD_bit => L_bit,
     out_code => temp_out_code,
@@ -183,10 +171,10 @@ port map(
 temp_esFSM: execution_state_FSM
 port map(
     clk => clk,
-    reset => debounced_reset,
-    step => debounced_step,
-    instr => debounced_instr,
-    go => debounced_go,
+    reset => reset,
+    step => step,
+    instr => instr,
+    go => go,
     control_state => temp_ctrl_state,
     out_execution_state => temp_ex_state    
 );
@@ -220,8 +208,6 @@ port map(
 
 temp_rf: rf
 port map(
-    disp_rad =>reg_select,
-    disp_rd =>temp_disp_rd,
     wd => temp_wd,
     rad1 => temp_rad1,
     rad2 => temp_rad2,
@@ -232,6 +218,7 @@ port map(
     wad => temp_wad,
     clk => clk,
     enable => temp_enable,
+    reset => reset,
     rd1 => temp_rf_rd1,
     rd2 => temp_rf_rd2,
     pc_enable => temp_pc_enable
@@ -243,50 +230,6 @@ port map(
     pmem => temp_pmem,
     out_code => temp_out_code
 );
-
-temp_Debouncer_reset: debounce
-port map(
-    input => reset,
-    clk => slow_clk,
-    output => debounced_reset
-);
-
-temp_Debouncer_step: debounce
-port map(
-    input => step,
-    clk => slow_clk,
-    output => debounced_step
-);
-temp_Debouncer_go: debounce
-port map(
-    input => go,
-    clk => slow_clk,
-    output => debounced_go
-);
-temp_Debouncer_instr: debounce
-port map(
-    input => instr,
-    clk => slow_clk,
-    output => debounced_instr
-);
-
-temp_Clock_Generator: Clock_generator
-port map(
-clk_in => clk,
-clk_out => slow_clk
-);
-
-temp_display_interface: display_interface
-port map(
-clk => clk,
-display_select => display_select,
-slice_select => slice_select,
-ex_state => temp_ex_state,
-control_state => temp_curr_control_state,
-pc => temp_pcout,
-rf_element => temp_disp_rd
-);
-
 
 cond <= temp_pmem (31 downto 28);
 F_field <= temp_pmem (27 downto 26);
@@ -306,6 +249,7 @@ Imm12 <= temp_pmem(11 downto 0);
 process(clk,reset)
 begin
 if reset = '1' then
+--    temp_pcin <= "00000000000000000000000000000000";
     temp_pcin <= X"00000000";
 else 
    case temp_curr_control_state is
@@ -316,7 +260,8 @@ else
             temp_pc_enable <= '1'; --this will increase the pc
             temp_rd1 <= temp_pcin;
             temp_rd2 <= X"00000004";
-            temp_sel <= "000000";
+--            temp_sel <= "000000";
+            temp_sel <= "000100";
             temp_flag_we <= '0';
         when "0001" =>
            temp_pc_enable <='0'; -- stop increasing pc
@@ -330,16 +275,15 @@ else
             temp_rd_data <= temp_rf_rd1;
         when "0011" =>
             temp_flag_we <= '1';
-            if temp_out_code = "000000" or temp_out_code = "000001" then
+            if temp_out_code = "001101" then
+                temp_rd1 <= X"00000000";
+                temp_sel <= "000100";
+            elsif temp_out_code = "001111" then    
+                temp_rd1 <= X"00000000";
+                temp_sel <= "000010";            
+            else 
                 temp_sel <= temp_out_code;
                 temp_rd1 <= temp_rn_data;
-            elsif temp_out_code = "000010" then
-                temp_rd1 <= X"00000000";
-                temp_sel <= "000000";
-            else
-                temp_rd1 <= temp_rn_data;
-                temp_sel <= "000001";
-            end if;
             if I_bit = '1' then
                 temp_rd2 <= std_logic_vector(resize(unsigned(Imm8),32));
             else 
@@ -348,7 +292,7 @@ else
         when "0111" =>
             temp_wad <= Rd;
             temp_wd <= temp_res;
-            if (temp_out_code /= "000011") then
+            if (temp_out_code /= "001010") then
                 temp_enable <= '1';
                 temp_flag_we <= '0';
             else
@@ -359,9 +303,9 @@ else
             temp_rd1 <= temp_rn_data;
             temp_rd2 <= std_logic_vector(resize(unsigned(Imm12),32));
             if U_bit = '1' then
-                temp_sel <= "000000";
+                temp_sel <= "000100";
             else
-                temp_sel <= "000001";
+                temp_sel <= "000010";
             end if;
         when "1001" =>--mem_rd (ldr instruction)
             temp_admem <= temp_res;
@@ -378,7 +322,7 @@ else
                 temp_carry <= '1';
                 temp_rd1 <= temp_pcout;
                 temp_rd2 <= std_logic_vector(to_signed((to_integer(shift_left(signed(Imm24),2))),32));
-                temp_sel <= "000000";
+                temp_sel <= "000100";
                 temp_pcin <=temp_res;    
 
             elsif temp_out_code <= "100111" then
@@ -386,7 +330,7 @@ else
                             temp_carry <= '1';
                             temp_rd1 <= temp_pcout;
                             temp_rd2 <= std_logic_vector(to_signed((to_integer(shift_left(signed(Imm24),2))),32));
-                            temp_sel <= "000000";
+                            temp_sel <= "000100";
                             temp_pcin <=temp_res;    
 
                 end if;
@@ -395,7 +339,7 @@ else
                             temp_carry <= '1';
                             temp_rd1 <= temp_pcout;
                             temp_rd2 <= std_logic_vector(to_signed((to_integer(shift_left(signed(Imm24),2))),32));
-                            temp_sel <= "000000";
+                            temp_sel <= "000100";
                             temp_pcin <=temp_res;    
                 end if;
             end if;
@@ -407,3 +351,4 @@ end process;
 
 
 end Behavioral;
+

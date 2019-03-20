@@ -51,7 +51,7 @@ Imm24 <= pmem(23 downto 0);
 Imm12 <= pmem(11 downto 0);
 
 --for DP instructions
- i_decoded <= andd WHEN cond="1110" and F_field="00" and I_bit='1' and Opcode="0000" else
+    i_decoded <= andd WHEN cond="1110" and F_field="00" and I_bit='1' and Opcode="0000" else
     eor WHEN cond="1110" and F_field="00" and I_bit='1' and Opcode="0001" else
     sub  WHEN cond="1110" and F_field="00" and I_bit='1' and Opcode="0010" else
     rsb WHEN cond="1110" and F_field="00" and I_bit='1' and Opcode="0011" else
