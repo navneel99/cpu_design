@@ -35,7 +35,7 @@ entity cpu is
 --  Port (     );
 end cpu;
 
-architecture Behavioral of cpu is
+ architecture Behavioral of cpu is
 
 component control_state_FSM
 Port ( 
@@ -80,11 +80,12 @@ PORT (
     clk : in std_logic;
 	rd1 : in std_logic_vector(31 downto 0); 
 	rd2 : in std_logic_vector(31 downto 0);
+	if_branch : in std_logic;
 --	operand inputs
 	sel : in std_logic_vector(5 downto 0); --add or subtract only
 	res : out std_logic_vector(31 downto 0); --result
 	carry : in std_logic;
-	flag : out std_logic; --flag output
+	flag : out std_logic_vector(3 downto 0); --flag output
 	flag_we: in std_logic
 	
 );
@@ -115,13 +116,17 @@ port(
 );
 end component;
 
-signal clk, reset, step, instr, go, temp_enable : std_logic;
+signal clk, reset, step, instr, go, temp_enable,temp_if : std_logic;
 signal temp_ex_state: std_logic_vector(2 downto 0);
+signal temp_flag: std_logic_vector(3 downto 0);
 signal temp_ctrl_state: std_logic_vector(1 downto 0);
 signal temp_rd1, temp_rd2, temp_res: std_logic_vector(31 downto 0);
 signal temp_sel, temp_out_code: std_logic_vector(5 downto 0);
-signal temp_carry, temp_flag, temp_flagwe: std_logic;
-signal temp_pmem, temp_wd: std_logic_vector(31 downto 0);
+signal temp_carry, temp_flagwe: std_logic;
+signal temp_pmem, temp_wd: std_logic_vector(31 downto 
+
+
+0);
 
 signal temp_rad1,temp_rad2, temp_wad: std_logic_vector(3 downto 0);
 
@@ -184,6 +189,7 @@ port map(
     clk => clk,
     rd1 => temp_rd1,
     rd2 => temp_rd2,
+    if_branch => temp_if,
     sel => temp_sel,
     res => temp_res,
     carry => temp_carry,
@@ -260,8 +266,7 @@ else
             temp_pc_enable <= '1'; --this will increase the pc
             temp_rd1 <= temp_pcin;
             temp_rd2 <= X"00000004";
---            temp_sel <= "000000";
-            temp_sel <= "000100";
+            temp_sel <= "000000";
             temp_flag_we <= '0';
         when "0001" =>
            temp_pc_enable <='0'; -- stop increasing pc
@@ -275,15 +280,16 @@ else
             temp_rd_data <= temp_rf_rd1;
         when "0011" =>
             temp_flag_we <= '1';
-            if temp_out_code = "001101" then
-                temp_rd1 <= X"00000000";
-                temp_sel <= "000100";
-            elsif temp_out_code = "001111" then    
-                temp_rd1 <= X"00000000";
-                temp_sel <= "000010";            
-            else 
+            if temp_out_code = "000000" or temp_out_code = "000001" then
                 temp_sel <= temp_out_code;
                 temp_rd1 <= temp_rn_data;
+            elsif temp_out_code = "000010" then
+                temp_rd1 <= X"00000000";
+                temp_sel <= "000000";
+            else
+                temp_rd1 <= temp_rn_data;
+                temp_sel <= "000001";
+            end if;
             if I_bit = '1' then
                 temp_rd2 <= std_logic_vector(resize(unsigned(Imm8),32));
             else 
@@ -292,7 +298,7 @@ else
         when "0111" =>
             temp_wad <= Rd;
             temp_wd <= temp_res;
-            if (temp_out_code(5 downto 2) /= "0010") then
+            if (temp_out_code /= "000011") then
                 temp_enable <= '1';
                 temp_flag_we <= '0';
             else
@@ -303,9 +309,9 @@ else
             temp_rd1 <= temp_rn_data;
             temp_rd2 <= std_logic_vector(resize(unsigned(Imm12),32));
             if U_bit = '1' then
-                temp_sel <= "000100";
+                temp_sel <= "000000";
             else
-                temp_sel <= "000010";
+                temp_sel <= "000001";
             end if;
         when "1001" =>--mem_rd (ldr instruction)
             temp_admem <= temp_res;
@@ -322,24 +328,24 @@ else
                 temp_carry <= '1';
                 temp_rd1 <= temp_pcout;
                 temp_rd2 <= std_logic_vector(to_signed((to_integer(shift_left(signed(Imm24),2))),32));
-                temp_sel <= "000100";
+                temp_sel <= "000000";
                 temp_pcin <=temp_res;    
 
             elsif temp_out_code <= "100111" then
-                if temp_flag = '1' then
+                if temp_flag(2) = '1' then
                             temp_carry <= '1';
                             temp_rd1 <= temp_pcout;
                             temp_rd2 <= std_logic_vector(to_signed((to_integer(shift_left(signed(Imm24),2))),32));
-                            temp_sel <= "000100";
+                            temp_sel <= "000000";
                             temp_pcin <=temp_res;    
 
                 end if;
             else
-                if temp_flag = '0' then
+                if temp_flag(2) = '0' then
                             temp_carry <= '1';
                             temp_rd1 <= temp_pcout;
                             temp_rd2 <= std_logic_vector(to_signed((to_integer(shift_left(signed(Imm24),2))),32));
-                            temp_sel <= "000100";
+                            temp_sel <= "000000";
                             temp_pcin <=temp_res;    
                 end if;
             end if;
