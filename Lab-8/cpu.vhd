@@ -292,7 +292,7 @@ else
         when "0111" =>
             temp_wad <= Rd;
             temp_wd <= temp_res;
-            if (temp_out_code /= "001010") then
+            if (temp_out_code(5 downto 2) /= "0010") then
                 temp_enable <= '1';
                 temp_flag_we <= '0';
             else
