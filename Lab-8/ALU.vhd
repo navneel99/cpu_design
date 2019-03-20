@@ -32,7 +32,7 @@ begin
 
 rd1_extend <=  '0'&rd1;
 rd2_extend <=  '0'&rd2;
-carry_vector<= "0000000000000000000000000000000"&carry when (if_branch='0') else "0000000000000000000000000000"&carry&"000";
+carry_vector<= "0000000000000000000000000000"&carry&"000" when (if_branch='1') else "0000000000000000000000000000000"&carry;
 --type_sel_slice <= sel(1 downto 0);
 --ins_sel_slice <= sel(5 downto 2);
 
