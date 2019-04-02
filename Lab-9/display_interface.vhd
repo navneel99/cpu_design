@@ -21,9 +21,8 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.std_logic_unsigned.all;
 
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
 use IEEE.NUMERIC_STD.ALL;
 
 -- Uncomment the following library declaration if instantiating
@@ -34,10 +33,11 @@ use IEEE.NUMERIC_STD.ALL;
 entity display_interface is
 Port (
     clk: in std_logic;
-    display_select: in std_logic_vector(2 downto 0);
+    display_select: in std_logic_vector(1 downto 0);
     slice_select: in std_logic;
-    state: in std_logic_vector(1 downto 0);
-    pmem,apmem,admem,dtmem,dfmem:in std_logic_vector(31 downto 0);
+    ex_state: in std_logic_vector(2 downto 0);
+    control_state: in std_logic_vector(3 downto 0);   
+    pc: in std_logic_vector(31 downto 0); 
     led_vector:out std_logic_vector(15 downto 0);
     rf_element: in std_logic_vector(31 downto 0)
  );
@@ -54,14 +54,11 @@ begin
 --    admem is 4
 --    dtmem is 5
     ful_instr <=
-         apmem when display_select = "000" else
-         pmem when display_select = "001" else
-         std_logic_vector(resize(unsigned(state),32)) when display_select = "010" else
-         dfmem when display_select = "011" else
-         admem when display_select = "100" else
-         dtmem when display_select =  "101" else
-         rf_element;
-         
+         std_logic_vector(resize((unsigned(ex_state)),32)) when display_select = "00" else
+         std_logic_vector(resize((unsigned(control_state)),32)) when display_select = "01" else
+         pc when display_select = "10" else
+         rf_element when display_select = "11";
+        
     ms_half <= ful_instr(31 downto 16);
     ls_half <= ful_instr(15 downto 0);
     led_vector <= ms_half when slice_select = '1' else
@@ -69,7 +66,7 @@ begin
 --    process(clk)
 --        begin
 --            if rising_edge(clk) then
---                if slice_select = '1' then    
+--                if slice_select = '1' then
 --                    led_vector <= ms_half;
 --                else
 --                    led_vector <= ls_half;
