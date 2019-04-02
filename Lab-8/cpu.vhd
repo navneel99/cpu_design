@@ -175,7 +175,7 @@ begin
 temp_csFSM: control_state_FSM
 port map(
     clk => clk,
-    reset => debounced_reset,
+    reset => reset,
     in_execution_state =>temp_ex_state,
     LD_bit => L_bit,
     out_code => temp_out_code,
@@ -186,10 +186,10 @@ port map(
 temp_esFSM: execution_state_FSM
 port map(
     clk => clk,
-    reset => debounced_reset,
-    step => debounced_step,
-    instr => debounced_instr,
-    go => debounced_go,
+    reset => reset,
+    step => step,
+    instr => instr,
+    go => go,
     control_state => temp_ctrl_state,
     out_execution_state => temp_ex_state    
 );
@@ -353,7 +353,7 @@ else
             temp_wad <= Rd;
             temp_wd <= temp_res;
             if (temp_out_code(5 downto 2) /= "0010") then
-                temp_enable <= '1';
+                temp_enable <= '1'; 
                 temp_flag_we <= '0';
             else
                 temp_enable <= '0';
