@@ -305,8 +305,17 @@ Imm8 <= temp_pmem(7 downto 0);
 Imm24 <= temp_pmem(23 downto 0);
 Imm12 <= temp_pmem(11 downto 0);
 
+--test_branch <= '1' when (temp_out_code(5 downto 4)="10") else '0';
+
 process(clk,reset)
 begin
+
+if (temp_out_code(5 downto 4)="10") then 
+test_branch <= '1';
+ else
+ test_branch <= '0';
+ end if;
+ 
 if reset = '1' then
 --    temp_pcin <= "00000000000000000000000000000000";
     temp_pcin <= X"00000000";
@@ -332,6 +341,9 @@ else
         when "0010" =>
             temp_rad1 <= Rd;
             temp_rd_data <= temp_rf_rd1;
+            if temp_out_code(5 downto 4) = "10" then 
+                test_branch <= '1';
+            end if; 
         when "0011" =>
             temp_flag_we <= '1';
             if temp_out_code = "001101" then
@@ -378,15 +390,15 @@ else
             temp_dtmem <= temp_rd_data;
             temp_dmem_we <= '1';
         when "0101" => --brn instruction  
-            test_branch <= '1';    
-            if temp_out_code <= "100110" then
+           -- test_branch <= '1';    
+            if temp_out_code <= "100110" then  --beq
                 temp_carry <= '1';
                 temp_rd1 <= temp_pcout;
                 temp_rd2 <= std_logic_vector(to_signed((to_integer(shift_left(signed(Imm24),2))),32));
                 temp_sel <= "000100";
                 temp_pcin <=temp_res;    
 
-            elsif temp_out_code <= "100111" then
+            elsif temp_out_code <= "100111" then  --bne
                 if temp_flag(2) = '1' then
                             temp_carry <= '1';
                             temp_rd1 <= temp_pcout;
@@ -412,5 +424,3 @@ end process;
 
 
 end Behavioral;
-
-
