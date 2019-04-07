@@ -30,6 +30,7 @@ signal temp_flag: std_logic_vector(3 downto 0);
 --signal ins_sel_slice: std_logic_vector(3 downto 0);
 begin 
 
+test <= '0';
 rd1_extend <=  '0'&rd1;
 rd2_extend <=  '0'&rd2;
 carry_vector<= "0000000000000000000000000000"&carry&"000" when (if_branch='1') else "0000000000000000000000000000000"&carry;
