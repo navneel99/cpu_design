@@ -57,16 +57,32 @@ Imm12 <= pmem(11 downto 0);
     rsb WHEN cond="1110" and F_field="00" and I_bit='1' and Opcode="0011" else
     add WHEN cond="1110" and F_field="00" and I_bit='1' and Opcode="0100" else
     adc WHEN cond="1110" and F_field="00" and I_bit='1' and Opcode="0101" else
-    sbc WHEN cond="1110" and F_field="00" and I_bit='0' and Opcode="0110" else
-    rsc WHEN cond="1110" and F_field="00" and I_bit='0' and Opcode="0111" else
-    tst WHEN cond="1110" and F_field="00" and I_bit='0' and Opcode="1000" else
-    teq WHEN cond="1110" and F_field="00" and I_bit='0' and Opcode="1001" else
+    sbc WHEN cond="1110" and F_field="00" and I_bit='1' and Opcode="0110" else
+    rsc WHEN cond="1110" and F_field="00" and I_bit='1' and Opcode="0111" else
+    tst WHEN cond="1110" and F_field="00" and I_bit='1' and Opcode="1000" else
+    teq WHEN cond="1110" and F_field="00" and I_bit='1' and Opcode="1001" else
     cmp WHEN cond="1110" and F_field="00" and I_bit='1' and Opcode="1010" else
     cmn WHEN cond="1110" and F_field="00" and I_bit='1' and Opcode="1011" else
     orr WHEN cond="1110" and F_field="00" and I_bit='1' and Opcode="1100" else
     mov WHEN cond="1110" and F_field="00" and I_bit='1' and Opcode="1101" else
     bic WHEN cond="1110" and F_field="00" and I_bit='1' and Opcode="1110" else
     mvn WHEN cond="1110" and F_field="00" and I_bit='1' and Opcode="1111" else
+    andd WHEN cond="1110" and F_field="00" and I_bit='0' and Opcode="0000" else
+    eor WHEN cond="1110" and F_field="00" and I_bit='0' and Opcode="0001" else
+    sub  WHEN cond="1110" and F_field="00" and I_bit='0' and Opcode="0010" else
+    rsb WHEN cond="1110" and F_field="00" and I_bit='0' and Opcode="0011" else
+    add WHEN cond="1110" and F_field="00" and I_bit='0' and Opcode="0100" else
+    adc WHEN cond="1110" and F_field="00" and I_bit='0' and Opcode="0101" else
+    sbc WHEN cond="1110" and F_field="00" and I_bit='0' and Opcode="0110" else
+    rsc WHEN cond="1110" and F_field="00" and I_bit='0' and Opcode="0111" else
+    tst WHEN cond="1110" and F_field="00" and I_bit='0' and Opcode="1000" else
+    teq WHEN cond="1110" and F_field="00" and I_bit='0' and Opcode="1001" else
+    cmp WHEN cond="1110" and F_field="00" and I_bit='0' and Opcode="1010" else
+    cmn WHEN cond="1110" and F_field="00" and I_bit='0' and Opcode="1011" else
+    orr WHEN cond="1110" and F_field="00" and I_bit='0' and Opcode="1100" else
+    mov WHEN cond="1110" and F_field="00" and I_bit='0' and Opcode="1101" else
+    bic WHEN cond="1110" and F_field="00" and I_bit='0' and Opcode="1110" else
+    mvn WHEN cond="1110" and F_field="00" and I_bit='0' and Opcode="1111" else
     
 --for DT instructions
     str WHEN cond="1110" and F_field="01" and I_bit='0' and U_bit='0' and L_bit='0' else
