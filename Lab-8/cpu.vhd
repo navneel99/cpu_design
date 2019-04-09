@@ -340,6 +340,8 @@ temp_spec <= temp_pmem(11 downto 8);
 
 --test_branch <= '1' when (temp_out_code(5 downto 4)="10") else '0';
 
+--test_branch <= '1' when (temp_out_code(5 downto 4)="10") else '0';
+
 process(clk,reset)
 begin
 
