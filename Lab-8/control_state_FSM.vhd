@@ -43,7 +43,7 @@ entity control_state_FSM is
 end control_state_FSM;
 
 architecture Behavioral of control_state_FSM is
-type control_state_fsm_type is (fetch, decode, instr_class_state, arith, res2RF, addr, mem_wr, mem_rd, mem2RF, brn, halt);
+type control_state_fsm_type is (fetch, decode, instr_class_state, shift, arith, res2RF, addr, mem_wr, mem_rd, mem2RF, brn, halt);
 
 signal control_fsm_state: control_state_fsm_type;
 signal instr_class_slice: std_logic_vector(1 downto 0);
@@ -62,6 +62,7 @@ begin
 --mem_wr as 1000
 --mem_rd as 1001
 --mem2RF as 1010
+--shift as 1011
 
 instr_class_slice <= out_code(5 downto 4);
 execution_state_slice <= in_execution_state(1 downto 0);
@@ -83,8 +84,8 @@ process(clk, control_fsm_state, reset)
                         curr_control_state <="0010";
                     when instr_class_state =>
                         if (instr_class_slice = "00") then
-                            control_fsm_state <= arith;
-                            curr_control_state <="0011";
+                            control_fsm_state <= shift;
+                            curr_control_state <="1011";
                         elsif ( instr_class_slice = "01") then
                             control_fsm_state <= addr;
                             curr_control_state <="0100";
@@ -97,6 +98,9 @@ process(clk, control_fsm_state, reset)
                             control_state <= "11";
                             curr_control_state <="0110";
                         end if;
+                    when shift =>
+                        control_fsm_state <= arith;
+                        curr_control_state <= "0011";
                     when arith =>             
                         control_fsm_state <= res2RF;
                         control_state <= "01";
