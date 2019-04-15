@@ -381,15 +381,17 @@ else
             end if; 
         when "0011" => 
             temp_flag_we <= temp_pmem(20);
+            temp_carry <= (shift_carry or temp_flag(1));
+            
             if temp_out_code = "001101" then
-                temp_rd1 <= X"00000000";
-                temp_sel <= "000100";              
+                temp_rd1 <= X"00000000";    
+                temp_sel <= temp_out_code;             
             elsif temp_out_code = "001111" then    
                 temp_rd1 <= X"00000000";
-                temp_sel <= "000010";                          
+                temp_sel <= temp_out_code;                                     
             else 
-                temp_sel <= temp_out_code;
                 temp_rd1 <= temp_rn_data;
+                temp_sel <= temp_out_code;
             end if;
             temp_rd2 <= res_shift;
                 
@@ -458,10 +460,15 @@ else
                 if X_bit = '0' then
                     shift_amnt <= std_logic_vector(resize(unsigned(Imm5),32));
                 else 
-                    temp_rd1 <= std_logic_vector(resize(unsigned(temp_spec),32));
-                    shift_amnt <= std_logic_vector(resize(unsigned(temp_rad1),32));
+                    temp_rad1 <= temp_spec;
                 end if;
-            end if;        
+            end if;  
+        when "1111" =>
+            if I_bit = '0' then 
+                if X_bit = '1' then
+                    shift_amnt <= temp_rf_rd1;
+                end if;
+            end if;
         when others =>
 --            temp_pcin <= temp_pcout;
    end case;
