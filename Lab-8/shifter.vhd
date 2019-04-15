@@ -13,20 +13,20 @@ PORT (
 end;
 
 architecture Arch_Shift of shifter is 
-signal temp_out : std_logic_vector(32 downto 0);
+signal temp_out : std_logic_vector(33 downto 0);
 begin 
 
-temp_out <= '0'&op1;
+temp_out <= '0'&op1&'0';
 
 res <= std_logic_vector(shift_left(unsigned(op1),to_integer(signed(shift)))) when sel="00" else  --LSL
        std_logic_vector(shift_right(unsigned(op1),to_integer(signed(shift)))) when sel="01" else   --LSR
        std_logic_vector(shift_right(signed(op1),to_integer(signed(shift)))) when sel="10" else   --ASR
        std_logic_vector(rotate_right(unsigned(op1),to_integer(signed(shift)))) when sel="11";  --ROR
        
---carry <= temp_out(32-to_integer(signed(shift))) when sel="00" else
---         temp_out(to_integer(signed(shift))-1) when sel="01" else
---         temp_out(to_integer(signed(shift))-1) when sel="10" else
---         temp_out(to_integer(signed(shift))-1) when sel="11";
+carry <= temp_out(33-to_integer(signed(shift))) when sel="00" else
+         temp_out(to_integer(signed(shift))) when sel="01" else
+         temp_out(to_integer(signed(shift))) when sel="10" else
+         '0' when sel="11";
                 
 end architecture Arch_Shift;
 
