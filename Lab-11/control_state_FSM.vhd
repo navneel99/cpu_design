@@ -104,8 +104,14 @@ process(clk, control_fsm_state, reset)
                                 curr_control_state <="0110";
                             end if;
                       else
-                            control_fsm_state <= fetch;
-                            curr_control_state <= "0000";
+                            if (instr_class_slice = "11") then
+                                control_fsm_state <= halt;
+                                control_state <= "11";
+                                curr_control_state <="0110";
+                            else
+                                control_fsm_state <= fetch;
+                                curr_control_state <= "0000";
+                            end if;
                       end if;
                     when shift_dp_read =>
                             control_fsm_state <= shift_dp_write;

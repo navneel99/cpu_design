@@ -29,7 +29,7 @@ Port (
   out_code: in std_logic_vector(5 downto 0);
   control_state: out std_logic_vector(1 downto 0); --if red then 01 else if halt then 11 else 00
   curr_control_state: out std_logic_vector(3 downto 0); --This will give the state of this FSM as a bit vector
-  p_bit: out std_logic
+  p_bit: in std_logic
   );
 end component;
 
@@ -59,15 +59,15 @@ PORT (
   );
 end component;
 
-component dist_mem_gen_1
-PORT (
-    a : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-    d : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-    clk : IN STD_LOGIC;
-    we : IN STD_LOGIC;
-    spo : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
-  );
-end component;
+--component dist_mem_gen_1
+--PORT (
+--    a : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+--    d : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+--    clk : IN STD_LOGIC;
+--    we : IN STD_LOGIC;
+--    spo : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+--  );
+--end component;
 
 component dist_mem_gen_2
 PORT (
@@ -234,8 +234,8 @@ begin
 
 temp_Predicate: Predicate
 port map(
-instr => temp_instr,
-flag => temp_p_flag,
+instr => cond,
+flag => temp_flag,
 p_bit => temp_p_bit
 );
 
@@ -458,7 +458,6 @@ test_branch <= '1';
  end if;
  
 if reset = '1' then
---    temp_pcin <= "00000000000000000000000000000000";
     temp_pcin <= X"00000000";
 else 
    case temp_curr_control_state is
@@ -472,7 +471,6 @@ else
             temp_rd2 <= X"00000004"; --Put 4 as the second port
             temp_sel <= "000100"; --Give add command
             temp_flag_we <= '0'; --Don't update the flags.
-
         when "0001" =>
            temp_pc_enable <='0'; -- stop increasing pc             
            temp_rad1 <= Rn;       --Rn is the address in pmem which is put in register file
@@ -522,13 +520,18 @@ else
             temp_rd2 <= res_shift;  --Second argument for all cases is the Shifted data from the shifter.
                 
         when "0111" => --res2RF instruction
-            temp_wad <= Rd;   --write address is the Rd register
-            temp_wd <= temp_res; -- the data to write will be the data from the ALU
-            if (temp_out_code(5 downto 2) /= "0010") then  --If the instruction was anything else than cmp or cmn
-                temp_enable <= '1';  --then allow writing the data in the Rd register
-            else --else if the instruction was cmp/cmn
-                temp_enable <= '0';  --Don't write the data in the final register
-             end if;
+            if (Rd /= "1111") then
+                temp_wad <= Rd;   --write address is the Rd register
+                temp_wd <= temp_res; -- the data to write will be the data from the ALU
+                if (temp_out_code(5 downto 2) /= "0010") then  --If the instruction was anything else than cmp or cmn
+                    temp_enable <= '1';  --then allow writing the data in the Rd register
+                else --else if the instruction was cmp/cmn
+                    temp_enable <= '0';  --Don't write the data in the final register
+                end if;
+            else
+                temp_pcin<=temp_res;                 
+            end if;
+    
         when "1100" => --shift_dt state
            --We would like to shift for all instruction irrespective of the P and the W bit. Store it in a different variable.
             if (F_field = "00") then  --str/ldr sh
@@ -596,7 +599,12 @@ else
                 temp_rd1 <= temp_pcout;
                 temp_rd2 <= std_logic_vector(to_signed((to_integer(shift_left(signed(Imm24),2))),32));
                 temp_sel <= "000101";
-                temp_pcin <=temp_res;    
+                temp_pcin <=temp_res;
+                if (temp_pmem(24) = '1') then
+                    temp_wad <= "1110"; --r14
+                    temp_enable <= '1';
+                    temp_wd <= temp_pcin; --write the old PC+4 to the link register.
+                end if;
 
             elsif temp_out_code <= "100111" then  --beq
                 if temp_flag(2) = '1' then
@@ -605,7 +613,6 @@ else
                             temp_rd2 <= std_logic_vector(to_signed((to_integer(shift_left(signed(Imm24),2))),32));
                             temp_sel <= "000101";
                             temp_pcin <=temp_res;    
-
                 end if;
             else
                 if temp_flag(2) = '0' then  --bne

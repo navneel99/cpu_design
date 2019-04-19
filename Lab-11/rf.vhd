@@ -27,19 +27,16 @@ signal pc : std_logic_vector(31 downto 0);
 
 begin
  
-rd1 <= rfile(to_integer(unsigned(rad1)));
-rd2 <= rfile(to_integer(unsigned(rad2)));
-
+rd1 <= rfile(to_integer(unsigned(rad1))) when rad1 /= "1111" else
+       pc;
+rd2 <= rfile(to_integer(unsigned(rad2))) when rad2 /= "1111" else
+       pc;
 pc <= pc_in when pc_enable = '1';
 pc_out <= pc;
 disp_rd <= rfile(to_integer(unsigned(disp_rad)));
---rfile(to_integer(unsigned(wad))) <= wd when enable = '1';
-
-
 
 process(clk)
 begin
-----    rfile <=(others=>"00000000000000000000000000000000");
 if rising_edge(clk) then
 	if(enable='1') then 
        rfile(to_integer(unsigned(wad))) <= wd;
