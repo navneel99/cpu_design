@@ -59,6 +59,16 @@ PORT (
   );
 end component;
 
+component dist_mem_gen_2
+PORT (
+    a : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+    d : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+    clk : IN STD_LOGIC;
+    we : IN STD_LOGIC;
+    spo : OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
+  );
+end component;
+
 component ALU
 PORT (
     clk : in std_logic;
@@ -128,6 +138,26 @@ Port (
  );
 end component;
 
+component shifter
+Port (
+    op1 : in std_logic_vector(31 downto 0);
+    res : out std_logic_vector(31 downto 0);
+    sel : in std_logic_vector(1 downto 0);
+    shift : in std_logic_vector(31 downto 0);
+    carry : out std_logic
+ );
+end component;
+
+component proc_dm_datapath
+Port(
+    word: in std_logic;
+    ldr_or_str : in std_logic; --1 if ldr, 0 if str
+    SH : in std_logic_vector(1 downto 0); -- 00 for unsigned byte, 01 for unsigned half word, 10 for signed byte and 11 for signed half word
+    full_word: in std_logic_vector(31 downto 0);
+    we_or_select: in std_logic_vector(1 downto 0); --when ldr then use select and when str then we
+    out_word: out std_logic_vector(31 downto 0)  --this word can be either going to the memory(after replication) or going from the memory(extracting hw or byte)
+);
+end component;
 
 signal slow_clk, debounced_reset, debounced_go, debounced_step,debounced_instr, temp_enable : std_logic;
 signal temp_ex_state: std_logic_vector(2 downto 0);
@@ -138,6 +168,7 @@ signal temp_carry, temp_flagwe: std_logic;
 signal temp_pmem, temp_wd: std_logic_vector(31 downto 0);
 signal temp_flag: std_logic_vector(3 downto 0);
 signal test_branch: std_logic;
+signal res_shift : std_logic_vector(31 downto 0);
 
 signal temp_rad1,temp_rad2, temp_wad: std_logic_vector(3 downto 0);
 signal temp_rf_rd1, temp_rf_rd2: std_logic_vector(31 downto 0);
@@ -148,7 +179,8 @@ signal temp_pcin : std_logic_vector(31 downto 0);
 signal temp_pcout : std_logic_vector(31 downto 0);
 signal temp_curr_control_state: std_logic_vector(3 downto 0);
 
-signal temp_dtmem, temp_admem, temp_dfmem:std_logic_vector(31 downto 0);
+signal temp_dtmem, temp_admem :std_logic_vector(31 downto 0);
+signal temp_dfmem: std_logic_vector(31 downto 0);
 signal temp_dmem_we: std_logic;
 signal reg_a,reg_b: std_logic_vector(31 downto 0);
 
@@ -160,7 +192,7 @@ signal cond : std_logic_vector (3 downto 0);
 signal F_field : std_logic_vector (1 downto 0);
 signal I_bit : std_logic;
 signal Opcode : std_logic_vector (3 downto 0);
-signal U_bit,L_bit: std_logic;
+signal U_bit,L_bit, P_bit, W_bit: std_logic;
 signal Rn: std_logic_vector(3 downto 0 );
 signal Rd: std_logic_vector(3 downto 0 );
 signal Imm8: std_logic_vector(7 downto 0);
@@ -168,14 +200,49 @@ signal Rm: std_logic_vector(3 downto 0 );
 signal Imm24: std_logic_vector(23 downto 0); 
 signal Imm12: std_logic_vector(11 downto 0);
 signal shift_spec: std_logic_vector(7 downto 0);
+signal temp_op1 : std_logic_vector(31 downto 0);
+signal shift_sel : std_logic_vector(1 downto 0);
+signal shift_amnt : std_logic_vector(31 downto 0);
+signal shift_carry : std_logic;
+signal X_bit : std_logic;
+signal Imm5 : std_logic_vector(4 downto 0);
+signal sel2 : std_logic_vector(1 downto 0);
+signal temp_spec : std_logic_vector(3 downto 0);
 
-
+signal offset_dt_add : std_logic_vector(31 downto 0); --It'll contain the sum of Rn_data and the shifter.
+signal dt_add: std_logic_vector(31 downto 0); --this depends on the P_bit
+signal decoded_we: std_logic_vector(3 downto 0);
+signal full_data_to_modules: std_logic_vector(31 downto 0);
+signal word_to_put_in_dataprocessor: std_logic_vector(31 downto 0);
 begin
+
+word_to_put_in_dataprocessor <= temp_rd_data when L_bit = '0' else
+                                temp_dfmem when L_bit = '1';
+
+temp_proc_dm_datapath: proc_dm_datapath
+port map(
+  word => F_field(0),
+  ldr_or_str => L_bit,
+  sh => sel2,
+  full_word => word_to_put_in_dataprocessor,
+  we_or_select => dt_add(1 downto 0),
+  out_word => full_data_to_modules
+);
+
+temp_Shifter: shifter
+port map(
+res => res_shift,
+op1 => temp_op1,
+sel => shift_sel,
+shift => shift_amnt,
+carry => shift_carry
+);
+    
 
 temp_csFSM: control_state_FSM
 port map(
     clk => clk,
-    reset => debounced_reset,
+    reset => reset,
     in_execution_state =>temp_ex_state,
     LD_bit => L_bit,
     out_code => temp_out_code,
@@ -186,10 +253,10 @@ port map(
 temp_esFSM: execution_state_FSM
 port map(
     clk => clk,
-    reset => debounced_reset,
-    step => debounced_step,
-    instr => debounced_instr,
-    go => debounced_go,
+    reset => reset,
+    step => step,
+    instr => instr,
+    go => go,
     control_state => temp_ctrl_state,
     out_execution_state => temp_ex_state    
 );
@@ -212,14 +279,50 @@ port map(
     a => temp_pcout(9 downto 2),
     spo => temp_pmem
 );
+--Old 32 Bit data memory
+--data_memory: dist_mem_gen_1 
+--port map(
+--    a => temp_admem(7 downto 0),
+--    d => temp_dtmem,
+--    clk => clk,
+--    we => temp_dmem_we,
+--    spo => temp_dfmem
+--);
 
-data_memory: dist_mem_gen_1
+data_memory_0: dist_mem_gen_2
 port map(
     a => temp_admem(7 downto 0),
-    d => temp_dtmem,
+    d => full_data_to_modules(7 downto 0),
     clk => clk,
-    we => temp_dmem_we,
-    spo => temp_dfmem
+    we => decoded_we(0),
+    spo => temp_dfmem(7 downto 0)
+);
+
+data_memory_1: dist_mem_gen_2
+port map(
+    a => temp_admem(7 downto 0),
+    d => full_data_to_modules(15 downto 8),
+    clk => clk,
+    we => decoded_we(1),
+    spo => temp_dfmem(15 downto 8)
+);
+
+data_memory_2: dist_mem_gen_2
+port map(
+    a => temp_admem(7 downto 0),
+    d => full_data_to_modules(23 downto 16),
+    clk => clk,
+    we => decoded_we(2),
+    spo => temp_dfmem(23 downto 16)
+);
+
+data_memory_3: dist_mem_gen_2
+port map(
+    a => temp_admem(7 downto 0),
+    d => full_data_to_modules(31 downto 24),
+    clk => clk,
+    we => decoded_we(3),
+    spo => temp_dfmem(31 downto 24)
 );
 
 temp_rf: rf
@@ -304,113 +407,196 @@ Rm <= temp_pmem(3 downto 0);
 Imm8 <= temp_pmem(7 downto 0);
 Imm24 <= temp_pmem(23 downto 0);
 Imm12 <= temp_pmem(11 downto 0);
+X_bit <= temp_pmem(4);
+Imm5 <= temp_pmem(11 downto 7);
+sel2 <= temp_pmem(6 downto 5);
+temp_spec <= temp_pmem(11 downto 8);
+
+P_bit <= temp_pmem(24);
+W_bit <= temp_pmem(21);
+
+decoded_we <=     "0000" when temp_dmem_we = '0' else
+                  "1111" when temp_dmem_we = '1' and F_field = "01" else --str
+                  "0011" when sel2(0)='1' and dt_add(1) = '0' else --strh
+                  "1100" when sel2(0)='1' and dt_add(1) = '1' else 
+                  "0001" when dt_add(1 downto 0) = "00" else   --Only for strb instructions.
+                  "0010" when dt_add(1 downto 0) = "01" else
+                  "0100" when dt_add(1 downto 0) = "10" else
+                  "1000" when dt_add(1 downto 0) = "11";
 
 process(clk,reset)
 begin
+
+if (temp_out_code(5 downto 4)="10") then 
+test_branch <= '1';
+ else
+ test_branch <= '0';
+ end if;
+ 
 if reset = '1' then
 --    temp_pcin <= "00000000000000000000000000000000";
     temp_pcin <= X"00000000";
 else 
    case temp_curr_control_state is
         when "0000" => --Fetch Statement
-            temp_carry <= '0';
+            temp_carry <= '0'; 
             temp_dmem_we <= '0';
             temp_enable <= '0';
+            --reset all the enables.
             temp_pc_enable <= '1'; --this will increase the pc
-            temp_rd1 <= temp_pcin;
-            temp_rd2 <= X"00000004";
---            temp_sel <= "000000";
-            temp_sel <= "000100";
-            temp_flag_we <= '0';
+            temp_rd1 <= temp_pcin; --Put the current pc in the ALU's first port
+            temp_rd2 <= X"00000004"; --Put 4 as the second port
+            temp_sel <= "000100"; --Give add command
+            temp_flag_we <= '0'; --Don't update the flags.
+
         when "0001" =>
-           temp_pc_enable <='0'; -- stop increasing pc
-           temp_rad1 <= Rn;
-           temp_rad2 <= Rm;
-           temp_pcin <= temp_res;
-           temp_rn_data <= temp_rf_rd1;
-           temp_rm_data <= temp_rf_rd2;
-        when "0010" =>
-            temp_rad1 <= Rd;
-            temp_rd_data <= temp_rf_rd1;
-        when "0011" =>
-            temp_flag_we <= '1';
-            if temp_out_code = "001101" then
-                temp_rd1 <= X"00000000";
-                temp_sel <= "000100";
-            elsif temp_out_code = "001111" then    
-                temp_rd1 <= X"00000000";
-                temp_sel <= "000010";            
+           temp_pc_enable <='0'; -- stop increasing pc             
+           temp_rad1 <= Rn;       --Rn is the address in pmem which is put in register file
+           temp_rad2 <= Rm;        --Rm is the address in pmem which is put in register file
+           temp_pcin <= temp_res;  -- PC = PC + 4 result stored in temp_pcin from ALU
+           temp_rn_data <= temp_rf_rd1;  --data from register file
+           temp_rm_data <= temp_rf_rd2;  -- data from register file
+
+        when "0010" => --Instruction_class state
+            temp_rad1 <= Rd;        -- Rd is the address. This is necessary for DT instructions
+            temp_rd_data <= temp_rf_rd1; --The data we get now stored
+        when "1011" => --shift_dp_read state
+            if I_bit = '1' then 
+                temp_op1 <= std_logic_vector(resize(unsigned(Imm8),32));  --The operand is the Imm8
+                shift_sel <= "11"; --explicitly define ROR as the only possible shift method.
+                shift_amnt <= std_logic_vector(resize(unsigned(temp_spec&'0'),32)); --multiplied temp_spec(rotspec) with 2 and considered it the shift.
             else 
-                temp_sel <= temp_out_code;
-                temp_rd1 <= temp_rn_data;
+                temp_op1 <= temp_rm_data;
+                shift_sel <= sel2; --shift type
+                
+                if X_bit = '0' then
+                    shift_amnt <= std_logic_vector(resize(unsigned(Imm5),32));
+                else 
+                    temp_rad1 <= temp_spec;
+--                    temp_rd1 <= std_logic_vector(resize(unsigned(temp_spec),32));
+--                    shift_amnt <= std_logic_vector(resize(unsigned(temp_rad1),32));
+                end if;
             end if;
-            if I_bit = '1' then
-                temp_rd2 <= std_logic_vector(resize(unsigned(Imm8),32));
-            else 
-                temp_rd2 <= temp_rm_data;
+        when "1111" => --shift_dp_write stage
+            if (I_bit = '0') then
+                if X_bit = '1' then
+                    shift_amnt <= temp_rf_rd1;
+                end if;
+            end if; 
+        when "0011" =>  --arith instruction
+            temp_flag_we <= temp_pmem(20); --S bit which tells whether to set the flag or not. 
+            --It toggles the flag_enable in ALU
+            temp_carry <= (shift_carry or temp_flag(1));  
+            if temp_out_code = "001101" then --mov instruction
+                temp_rd1 <= X"00000000";  --explicitly  give the 1st argument to the ALU as 0
+            elsif temp_out_code = "001111" then    --mvn instruction
+                temp_rd1 <= X"00000000";  --explicitly  give the 1st argument to the ALU as 0
+            else  --for all other instructions...
+                temp_rd1 <= temp_rn_data;  -- The first argument is the register Rn's data
             end if;
-        when "0111" =>
-            temp_wad <= Rd;
-            temp_wd <= temp_res;
-            if (temp_out_code(5 downto 2) /= "0010") then
-                temp_enable <= '1';
-                temp_flag_we <= '0';
-            else
-                temp_enable <= '0';
-                temp_flag_we <= '1';
+            temp_sel <= temp_out_code;  --instruction for ALU is the same as given in the  decoder out code
+            temp_rd2 <= res_shift;  --Second argument for all cases is the Shifted data from the shifter.
+                
+        when "0111" => --res2RF instruction
+            temp_wad <= Rd;   --write address is the Rd register
+            temp_wd <= temp_res; -- the data to write will be the data from the ALU
+            if (temp_out_code(5 downto 2) /= "0010") then  --If the instruction was anything else than cmp or cmn
+                temp_enable <= '1';  --then allow writing the data in the Rd register
+            else --else if the instruction was cmp/cmn
+                temp_enable <= '0';  --Don't write the data in the final register
              end if;
+        when "1100" => --shift_dt state
+           --We would like to shift for all instruction irrespective of the P and the W bit. Store it in a different variable.
+            if (F_field = "00") then  --str/ldr sh
+                if temp_pmem(22) = '1' then
+                    temp_op1 <= std_logic_vector(resize(unsigned(temp_pmem(11 downto 8) & temp_pmem(3 downto 0)),32));
+                else
+                    temp_op1 <= temp_rm_data;
+                end if;
+                shift_amnt <= X"00000000";
+                shift_sel <= sel2;
+            elsif (F_field ="01") then --str/ldr
+                if I_bit = '0' then
+                   temp_op1 <= std_logic_vector(resize(unsigned(Imm12),32));
+                   shift_amnt <= X"00000000";
+                   shift_sel <= "00";
+                   --dummy shifting by 0
+                else
+                    temp_op1 <= temp_rm_data;
+                    shift_amnt <= std_logic_vector(resize(unsigned(Imm5),32));
+                    shift_sel <= sel2; 
+                end if;
+                -- answer in res_shift
+            end if;   
+            
         when "0100" => --addr instruction
             temp_rd1 <= temp_rn_data;
-            temp_rd2 <= std_logic_vector(resize(unsigned(Imm12),32));
+            temp_rd2 <= res_shift;
             if U_bit = '1' then
                 temp_sel <= "000100";
             else
                 temp_sel <= "000010";
             end if;
+            offset_dt_add <= temp_res;   
+            --offset_dt_add has the sum of rn_data and shift addition.
+            -- If P_bit is 0 then just use the rn_data else use the temp_res.
+            if (P_bit = '1') then
+                dt_add <= temp_res;
+            else
+                dt_add <= temp_rn_data;
+            end if;
+            
         when "1001" =>--mem_rd (ldr instruction)
-            temp_admem <= temp_res;
+                temp_admem <= dt_add;
         when "1010" => -- mem2RF
             temp_wad <= Rd;
             temp_enable <= '1';
-            temp_dfmem <= temp_wd;
+            temp_wd <= full_data_to_modules;
+            --New state after this for increment/decrement
+            
         when "1000" => --mem_wr (str instruction)
-            temp_admem <= temp_res;
-            temp_dtmem <= temp_rd_data;
+            temp_admem <= dt_add;
             temp_dmem_we <= '1';
-        when "0101" => --brn instruction  
-            test_branch <= '1';    
-            if temp_out_code <= "100110" then
+            --New state after this for auto increment/decrement
+        when "1101" =>
+            --offset_dt_add has the sum of Rn_data and shift result. We will write the answer now.
+            if (W_bit = '1' or P_bit = '0') then
+                temp_wad <= Rn;
+                temp_enable <= '1';
+                temp_wd <= offset_dt_add;    
+            end if;
+                 
+        when "0101" => --brn instruction   
+            if temp_out_code <= "100110" then  --b
                 temp_carry <= '1';
                 temp_rd1 <= temp_pcout;
                 temp_rd2 <= std_logic_vector(to_signed((to_integer(shift_left(signed(Imm24),2))),32));
-                temp_sel <= "000100";
+                temp_sel <= "000101";
                 temp_pcin <=temp_res;    
 
-            elsif temp_out_code <= "100111" then
+            elsif temp_out_code <= "100111" then  --beq
                 if temp_flag(2) = '1' then
                             temp_carry <= '1';
                             temp_rd1 <= temp_pcout;
                             temp_rd2 <= std_logic_vector(to_signed((to_integer(shift_left(signed(Imm24),2))),32));
-                            temp_sel <= "000100";
+                            temp_sel <= "000101";
                             temp_pcin <=temp_res;    
 
                 end if;
             else
-                if temp_flag(2) = '0' then
+                if temp_flag(2) = '0' then  --bne
                             temp_carry <= '1';
                             temp_rd1 <= temp_pcout;
                             temp_rd2 <= std_logic_vector(to_signed((to_integer(shift_left(signed(Imm24),2))),32));
-                            temp_sel <= "000100";
+                            temp_sel <= "000101";
                             temp_pcin <=temp_res;    
                 end if;
             end if;
+                
         when others =>
---            temp_pcin <= temp_pcout;
    end case;
 end if;
 end process;
 
 
 end Behavioral;
-
-

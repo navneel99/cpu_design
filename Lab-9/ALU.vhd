@@ -78,4 +78,3 @@ res <= out_alu(31 downto 0);
 --end process;
 
 end Arch_ALU;
-
