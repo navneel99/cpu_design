@@ -14,6 +14,7 @@ end multiplier;
 architecture Arch_MUL of multiplier is 
 signal A_bit : std_logic;
 signal decider_bit : std_logic;
+signal temp_mul : std_logic_vector(127 downto 0);
 signal big_mul : std_logic_vector(63 downto 0);
 signal zero : std_logic_vector(31 downto 0); 
 signal U_bit : std_logic;
@@ -34,21 +35,15 @@ decider_bit <= instr(23);
 zero <= (others => '0');
 U_bit <= instr(22);
 
-op1_64s <= std_logic_vector(resize(signed(op1),64));
-op2_64s <= std_logic_vector(resize(signed(op2),64));
-op3_64s <= std_logic_vector(resize(signed(op3),32));
-op4_64s <= std_logic_vector(resize(signed(op4),32));
-op1_64us <= std_logic_vector(resize(unsigned(op1),64));
-op2_64us <= std_logic_vector(resize(unsigned(op2),64));
-op3_64us <= std_logic_vector(resize(unsigned(op3),32));
-op4_64us <= std_logic_vector(resize(unsigned(op4),32));
 
 big_mul <= 
-        std_logic_vector(unsigned(op1_64us)*unsigned(op2_64us)) when A_bit='0' and decider_bit='1' and U_bit='0' else     
-        std_logic_vector((unsigned(op1_64us)*unsigned(op2_64us))+(unsigned(op3) and unsigned(op4))) when A_bit='1' and decider_bit='1' and U_bit='0' else
-        std_logic_vector(signed(op1_64us)*signed(op2_64us)) when A_bit='0' and decider_bit='1' and U_bit='1' else     
-        std_logic_vector((signed(op1_64us)*signed(op2_64us))+(signed(op3)&signed(op4))) when A_bit='1' and decider_bit='1' and U_bit='1';
-        
+        std_logic_vector(unsigned(op1)*unsigned(op2)) when A_bit='0' and decider_bit='1' and U_bit='0' else     
+        std_logic_vector((unsigned(op1)*unsigned(op2))+(unsigned(op3) and unsigned(op4))) when A_bit='1' and decider_bit='1' and U_bit='0' else
+        std_logic_vector(signed(op1)*signed(op2)) when A_bit='0' and decider_bit='1' and U_bit='1' else     
+        std_logic_vector((signed(op1)*signed(op2))+(signed(op4)&signed(op3))) when A_bit='1' and decider_bit='1' and U_bit='1';
+ 
+--big_mul <= temp_mul(63 downto 0) when U_bit='0' else
+--            temp_mul(127)&temp_mul(62 downto 0) when U_bit ='1';     
 
 res1 <= 
         std_logic_vector(resize((unsigned(op1)*unsigned(op2)),32)) when (A_bit='0' and decider_bit='0') else
