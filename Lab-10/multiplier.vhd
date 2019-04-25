@@ -18,15 +18,6 @@ signal temp_mul : std_logic_vector(127 downto 0);
 signal big_mul : std_logic_vector(63 downto 0);
 signal zero : std_logic_vector(31 downto 0); 
 signal U_bit : std_logic;
-signal op1_64s : std_logic_vector(63 downto 0);
-signal op2_64s : std_logic_vector(63 downto 0);
-signal op3_64s : std_logic_vector(31 downto 0);
-signal op4_64s : std_logic_vector(31 downto 0);
-signal op1_64us : std_logic_vector(63 downto 0);
-signal op2_64us : std_logic_vector(63 downto 0);
-signal op3_64us : std_logic_vector(31 downto 0);
-signal op4_64us : std_logic_vector(31 downto 0);
-
 
 begin
 
