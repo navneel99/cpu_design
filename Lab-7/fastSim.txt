@@ -1,14 +1,14 @@
-add_force {/cpu/clk} -radix hex {1 0ns} {0 500000ps} -repeat_every 1000000ps
+add_force {/cpunew/clk} -radix hex {1 0ns} {0 500000ps} -repeat_every 1000000ps
 
-add_force {/cpu/reset} -radix hex {1 0ns}
+add_force {/cpunew/reset} -radix hex {1 0ns}
 
-add_force {/cpu/step} -radix hex {0 0ns}
+add_force {/cpunew/step} -radix hex {0 0ns}
 
-add_force {/cpu/instr} -radix hex {0 0ns}
+add_force {/cpunew/instr} -radix hex {0 0ns}
 
-add_force {/cpu/go} -radix hex {1 0ns}
+add_force {/cpunew/go} -radix hex {1 0ns}
 
 run 1 us
 
-add_force {/cpu/reset} -radix hex {0 0ns}
+add_force {/cpunew/reset} -radix hex {0 0ns}
 run 1 us
