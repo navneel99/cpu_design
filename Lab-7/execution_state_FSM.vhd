@@ -49,7 +49,7 @@ architecture Behavioral of execution_state_FSM is
 --    done is 100
 begin
 
-process(clk,reset,temp_execution_state)
+process(clk,reset)
 begin
     if (reset = '1') then
         temp_execution_state <= "000";

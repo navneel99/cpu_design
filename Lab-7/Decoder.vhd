@@ -48,7 +48,9 @@ Imm24 <= pmem(23 downto 0);
 Imm12 <= pmem(11 downto 0);
 
 --for DP instructions
- i_decoded <= add  WHEN cond="1110" and F_field="00" and I_bit='1' and Opcode="0100" else
+ i_decoded <= 
+    halt when pmem = "00000000000000000000000000000000" else
+    add  WHEN cond="1110" and F_field="00" and I_bit='1' and Opcode="0100" else
     sub WHEN cond="1110" and F_field="00" and I_bit='1' and Opcode="0010" else
     mov WHEN cond="1110" and F_field="00" and I_bit='1' and Opcode="1101" else
     cmp WHEN cond="1110" and F_field="00" and I_bit='1' and Opcode="1010" else
@@ -66,8 +68,7 @@ Imm12 <= pmem(11 downto 0);
     b   WHEN cond="1110" else
     beq WHEN cond="0000" else
     bne WHEN cond="0001" else
-
-    halt when pmem = "00000000000000000000000000000000";
+    unknown;
 --    null when others;
     
     instr_class <= DP when F_field = "00" else

@@ -27,11 +27,11 @@ begin
 
 rd1_extend <=  rd1;
 rd2_extend <=  rd2;
-carry_vector <= "0000000000000000000000000000"& carry &"000";
+carry_vector <= "0000000000000000000000000000000"& carry;
 
 out_alu <= 
 std_logic_vector(unsigned(rd1_extend) + unsigned(rd2_extend) + unsigned(carry_vector))  when sel="000000" else --add
-std_logic_vector(unsigned(rd1_extend) - unsigned(rd2_extend)) when sel="000001" ;-- else --sub
+std_logic_vector(unsigned(rd1_extend) - unsigned(rd2_extend));-- else --sub
 --std_logic_vector(unsigned(rd1_extend) + unsigned(rd2_extend) + unsigned(carry_vector)) when sel="000010" else  --addc
 --std_logic_vector(unsigned(rd1_extend) - unsigned(rd2_extend) + unsigned(carry_vector)) when sel="000011";  --subc 
 

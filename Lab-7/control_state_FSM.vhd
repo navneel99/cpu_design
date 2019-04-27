@@ -66,7 +66,7 @@ begin
 instr_class_slice <= out_code(5 downto 4);
 execution_state_slice <= in_execution_state(1 downto 0);
 
-process(clk, control_fsm_state, reset)
+process(clk,reset)
     begin
         if reset = '1' then
             control_fsm_state <= fetch;
@@ -109,7 +109,6 @@ process(clk, control_fsm_state, reset)
                             control_fsm_state <= mem_wr;
                             control_state <= "01";
                             curr_control_state <="1000";
-
                         end if;
                    when mem_rd =>
                         control_fsm_state <= mem2RF;
