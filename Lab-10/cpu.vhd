@@ -545,7 +545,7 @@ else
                 temp_wad <= Rn;
                 temp_wd <= mul_res1;                       
             else            
-                temp_wad <= Rn;
+                temp_wad <= Rd;
 --                temp_wad2 <= Rd;
                 temp_wd <= mul_res1;
 --                temp_wd2 <= mul_res2;               
@@ -554,7 +554,7 @@ else
         when "10001" =>  --mul2RF instruction
         temp_enable <= '1';      
         if temp_pmem(23)='1' then
-            temp_wad <= Rd;
+            temp_wad <= Rn;
             temp_wd <= mul_res2;
         end if;    
             
