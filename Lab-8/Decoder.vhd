@@ -130,4 +130,3 @@ Imm12 <= pmem(11 downto 0);
      			"111001" WHEN i_decoded = halt;
 
 end Arch_Decoder;
-

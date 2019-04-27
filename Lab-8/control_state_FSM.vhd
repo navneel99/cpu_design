@@ -43,7 +43,7 @@ entity control_state_FSM is
 end control_state_FSM;
 
 architecture Behavioral of control_state_FSM is
-type control_state_fsm_type is (fetch, decode, instr_class_state, shiftRead, shiftWrite, arith, res2RF, addr, mem_wr, mem_rd, mem2RF, brn, halt);
+type control_state_fsm_type is (fetch, decode, instr_class_state, arith,shift_Write,shift_Read, res2RF, addr, mem_wr, mem_rd, mem2RF, brn, halt);
 
 signal control_fsm_state: control_state_fsm_type;
 signal instr_class_slice: std_logic_vector(1 downto 0);
@@ -68,7 +68,7 @@ begin
 instr_class_slice <= out_code(5 downto 4);
 execution_state_slice <= in_execution_state(1 downto 0);
 
-process(clk, control_fsm_state, reset)
+process(clk,reset)
     begin
         if reset = '1' then
             control_fsm_state <= fetch;
@@ -85,7 +85,7 @@ process(clk, control_fsm_state, reset)
                         curr_control_state <="0010";
                     when instr_class_state =>
                         if (instr_class_slice = "00") then
-                            control_fsm_state <= shiftRead;
+                            control_fsm_state <= shift_Read;
                             curr_control_state <="1011";
                         elsif ( instr_class_slice = "01") then
                             control_fsm_state <= addr;
@@ -99,12 +99,14 @@ process(clk, control_fsm_state, reset)
                             control_state <= "11";
                             curr_control_state <="0110";
                         end if;
-                    when shiftRead =>
-                        control_fsm_state <= shiftWrite;
-                        curr_control_state <= "1111";
-                    when shiftWrite =>
+                    when shift_Read =>
+                        control_fsm_state <= shift_Write;
+                        control_state <= "01";
+                        curr_control_state <="1111";
+                    when shift_Write =>
                         control_fsm_state <= arith;
-                        curr_control_state <= "0011"; 
+                        control_state <= "01";
+                        curr_control_state <="0011";
                     when arith =>             
                         control_fsm_state <= res2RF;
                         control_state <= "01";
@@ -117,7 +119,6 @@ process(clk, control_fsm_state, reset)
                             control_fsm_state <= mem_wr;
                             control_state <= "01";
                             curr_control_state <="1000";
-
                         end if;
                    when mem_rd =>
                         control_fsm_state <= mem2RF;

@@ -59,7 +59,7 @@ begin
          std_logic_vector(resize((unsigned(ex_state)),32)) when display_select = "00" else
          std_logic_vector(resize((unsigned(control_state)),32)) when display_select = "01" else
          pc when display_select = "10" else
-         rf_element when display_select = "11";
+         rf_element;
         
     ms_half <= ful_instr(31 downto 16);
     ls_half <= ful_instr(15 downto 0);
