@@ -398,7 +398,7 @@ temp_carry <= '1' when temp_curr_control_state = "0000" or temp_curr_control_sta
               (shift_carry or temp_flag(1)) when temp_curr_control_state="0011" else
               '0';
 
-temp_flag_we <= temp_pmem(20) when temp_out_code ="000011" and temp_curr_control_state ="0011" else
+temp_flag_we <= temp_pmem(20) when temp_out_code(5 downto 2) ="0010" and temp_curr_control_state ="0011" else
                '0';
                
 temp_admem <= temp_result when temp_curr_control_state ="1000" or temp_curr_control_state ="1001";
