@@ -50,7 +50,7 @@ rd2_extend when sel="001101" else  --mov
 
 temp_flag(0) <= (out_alu(32) xor(rd1_extend(31)) xor rd2_extend(32));                                              --V flag
 temp_flag(1) <= out_alu(32);                                                            --C flag
-temp_flag(2) <= '1' when out_alu = "00000000000000000000000000000000" else   --Z flag
+temp_flag(2) <= '1' when out_alu = "000000000000000000000000000000000" else   --Z flag
         '0';
 temp_flag(3) <= out_alu(31);                                                                             --N flag
 
